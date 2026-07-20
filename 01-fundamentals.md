@@ -1,6 +1,6 @@
-# Tutorial 1: Project Setup & Architecture
+# 🎨 Tutorial 1: Project Setup & Architecture
 
-### What you'll learn:
+📘 **What you'll learn:**
 - How this monorepo is structured (Angular 17 + Express)
 - How to run both servers locally
 - Angular 17 Signals & Standalone components in action
@@ -8,66 +8,99 @@
 
 **Prerequisites:** Basic knowledge of TypeScript and web development.
 
+> **📖 New terms in this chapter:**
+> - **Monorepo:** A single repository containing multiple distinct projects (here, frontend and backend).
+> - **Signals:** A new Angular feature for managing state reactively without complex RxJS observables.
+> - **Standalone Components:** Angular components that don't need a bulky `NgModule` to work.
+
 ---
 
-## 1. Repository Structure
-This project is divided into two main folders:
-- `angular-client/`: The frontend Angular 17 application using standalone components and Signals.
-- `express-server/`: The Node.js Express backend using Socket.IO and MongoDB.
+## 📘 Learn: System Architecture
 
-## 2. Running Locally
+Before we code, let's visualize how the entire Smart Wall Painter app connects:
 
-Before running, ensure you have a `.env` file in `express-server/` with your MongoDB URI, JWT Secret, and Cloudinary keys.
+```mermaid
+graph LR
+    A[Angular 17 Client] <-->|Socket.IO / HTTP| B(Express Server)
+    B <-->|Mongoose| C[(MongoDB Atlas)]
+    B <-->|Multer| D[Cloudinary]
+    A -->|Uploads| D
+```
 
-Start the backend:
+---
+
+## 🛠️ Build: Running Locally
+
+Follow these step-by-step instructions to get the app running on your machine.
+
+**Step 1. Configure the Backend**
+Open the `express-server/` directory and create a `.env` file.
+```text
+// file: express-server/.env
+PORT=5000
+MONGODB_URI=your_mongo_url
+JWT_SECRET=supersecret
+CLOUDINARY_URL=your_cloudinary_url
+```
+![step-1](https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=800&auto=format&fit=crop)
+
+**Step 2. Start the Backend Server**
+Run the following in your terminal:
 ```bash
 cd express-server
 npm install
 npm run dev
 ```
 
-Start the frontend:
+**Step 3. Start the Frontend Client**
+Open a new terminal tab and start Angular:
 ```bash
 cd angular-client
 npm install
 npm start
 ```
+![step-3](./images/01-step-3.png)
 
-## 3. Angular 17 Standalone & Signals
-In this repo, we use the latest Angular features. Instead of `NgModules`, components like the Canvas Editor pull in exactly what they need.
+---
 
-Notice how we use **Signals** in `canvas-editor.component.ts`:
+## 📘 Learn: The Code Setup
+
+### Angular 17 Signals
+In this app, we use Signals to manage state cleanly. Look at the canvas editor:
+
 ```typescript
-// src/app/features/canvas-editor/canvas-editor.component.ts
-export class CanvasEditorComponent implements OnInit, OnDestroy {
+// file: angular-client/src/app/features/canvas-editor/canvas-editor.component.ts
+export class CanvasEditorComponent {
   activeTool = signal<'select' | 'pan' | 'draw' | 'wall' | 'erase'>('select');
   canUndo = signal(false);
-  canRedo = signal(false);
-  
-  // ...
+}
 ```
-Signals provide a simpler, more reactive way to manage state without complex RxJS observables!
 
-## 4. Express Bootstrap
-Our API is bootstrapped in `express-server/src/index.ts`. Here's a snippet showing how we combine Express, Rate Limiting, and Socket.IO:
+### Express Bootstrap
+Our backend is initialized cleanly with Express and Socket.IO working together on the same port:
 
 ```typescript
-// src/index.ts
+// file: express-server/src/index.ts
 import express from 'express';
 import http from 'http';
 import { Server } from 'socket.io';
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server, {
-  cors: { origin: '*', methods: ['GET', 'POST', 'PUT', 'DELETE'] }
-});
-
-// Setup Socket.IO
-setupSocketHandlers(io);
+const io = new Server(server, { cors: { origin: '*' } });
 ```
 
 ---
 
-### Try it yourself!
-*Exercise:* Create a new Signal in `canvas-editor.component.ts` called `backgroundColor` and bind it to the stage background!
+## 🧪 Practice: Build It Yourself
+
+**Goal:** Add a new Express route and call it from Angular.
+
+1. Create a `/api/health` route in Express that returns `{ status: "ok" }`.
+2. Create an Angular service that fetches this route on load.
+3. Display the status on the dashboard!
+
+**✅ Check yourself:**
+- [ ] Did you restart the Express server after adding the route?
+- [ ] Does navigating to `http://localhost:5000/api/health` work in your browser?
+- [ ] Does the Angular UI update when the request finishes?

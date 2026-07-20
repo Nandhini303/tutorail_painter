@@ -1,48 +1,42 @@
-# Tutorial 3: Realtime Collaboration (Socket.IO)
+# 🎨 Tutorial 3: Realtime Collaboration (Socket.IO)
 
-### What you'll learn:
+📘 **What you'll learn:**
 - Emitting and listening to events in Angular
 - Syncing live drawing data across multiple clients
 
 **Prerequisites:** [Tutorial 2: Canvas Engine (Konva.js)](./02-canvas-engine.md)
 
+> **📖 New terms in this chapter:**
+> - **Socket.IO:** A library that enables persistent, bi-directional communication between a web client and server (using WebSockets).
+> - **Emit:** Sending an event/data message through the socket.
+> - **Broadcast:** Sending a message to everyone *except* the sender.
+
 ---
 
-## 1. Client-Side Socket Service
-To keep our Angular components clean, we encapsulate all real-time logic in `socket.service.ts`.
+## 📘 Learn: Event Sequence
 
-```typescript
-// src/app/services/socket.service.ts
-import { Injectable } from '@angular/core';
-import { io, Socket } from 'socket.io-client';
+When one user draws, everyone else sees it instantly without refreshing.
 
-@Injectable({ providedIn: 'root' })
-export class SocketService {
-  private socket!: Socket;
-  private serverUrl = 'https://wall-painter.onrender.com';
-
-  constructor() {
-    this.socket = io(this.serverUrl, { autoConnect: false });
-  }
-
-  joinProjectRoom(projectId: string): void {
-    if (!this.socket.connected) this.socket.connect();
-    this.socket.emit('join-project', projectId);
-  }
-
-  on(eventName: string, callback: any): void {
-    if (this.socket) {
-      this.socket.on(eventName, callback);
-    }
-  }
-}
+```mermaid
+sequenceDiagram
+    participant User A
+    participant Server
+    participant User B
+    
+    User A->>Server: emit('layer-update', canvasData)
+    Server-->>User B: emit('layer-update-broadcast', canvasData)
+    Note over User B: Updates Konva Layer
 ```
 
-## 2. Server-Side Handlers
-On the Express side, we listen for these events in `socketHandler.ts` and broadcast them to everyone else in the specific project room.
+---
+
+## 🛠️ Build: Real-time Architecture
+
+**Step 1. Server Event Handlers**
+The backend needs to receive data from one client and bounce it to others in the same room.
 
 ```typescript
-// src/sockets/socketHandler.ts
+// file: express-server/src/sockets/socketHandler.ts
 export const setupSocketHandlers = (io: Server) => {
   io.on('connection', (socket) => {
     socket.on('join-project', (projectId) => {
@@ -50,17 +44,62 @@ export const setupSocketHandlers = (io: Server) => {
     });
 
     socket.on('layer-update', (data) => {
-      // Broadcast to everyone else in the room
+      // Broadcast to everyone else in the room!
       socket.to(data.projectId).emit('layer-update-broadcast', data);
     });
   });
 };
 ```
+![step-1](./images/03-step-1.png)
 
-## 3. Avoiding Feedback Loops
-When receiving a `layer-update-broadcast` in Angular, it is critical to update the canvas *without* re-triggering another `layer-update` emission, or you'll create an infinite loop!
+**Step 2. Client Socket Service**
+In Angular, we centralize this logic into a reusable service.
+
+```typescript
+// file: angular-client/src/app/services/socket.service.ts
+import { Injectable } from '@angular/core';
+import { io, Socket } from 'socket.io-client';
+
+@Injectable({ providedIn: 'root' })
+export class SocketService {
+  private socket: Socket = io('https://wall-painter.onrender.com');
+
+  joinProjectRoom(projectId: string): void {
+    this.socket.emit('join-project', projectId);
+  }
+
+  on(eventName: string, callback: any): void {
+    this.socket.on(eventName, callback);
+  }
+}
+```
+
+**Step 3. Receiving Data in the Canvas**
+When the canvas receives an update, it must redraw itself.
+
+```typescript
+// file: angular-client/src/app/features/canvas-editor/canvas-editor.component.ts
+ngOnInit() {
+  this.socketService.on('layer-update-broadcast', (data) => {
+    // Prevent infinite loop by flagging this as a remote update!
+    this.isRemoteUpdate = true; 
+    this.loadCanvasData(data.layers);
+  });
+}
+```
+![step-3](https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=800&auto=format&fit=crop)
 
 ---
 
-### Try it yourself!
-*Exercise:* Implement a "Live Cursors" feature by emitting mouse coordinates in `canvas-editor.component.ts` (`mousemove`) and rendering tiny cursors for other users.
+## 🧪 Practice: Build It Yourself
+
+**Goal:** Broadcast a new custom Socket.IO event (e.g., user typing indicator or live cursors).
+
+1. Listen to the Konva stage `mousemove` event.
+2. Throttle the event (so you don't spam the server) and emit the X/Y coordinates.
+3. Have other clients listen for these coordinates and render a tiny colored circle at that spot.
+
+**✅ Check yourself:**
+- [ ] Did you remember to throttle the `mousemove` event?
+- [ ] Are coordinates being broadcasted successfully to the server?
+- [ ] Do you see the other user's cursor moving on your screen?
