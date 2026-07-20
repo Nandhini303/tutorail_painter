@@ -1,85 +1,66 @@
-# 🎨 Tutorial 1: Project Setup & Architecture (Beginner Guide)
+# 🎨 Tutorial 1: Project Setup & Architecture (Beginner + Tanglish Guide)
 
-📘 **What you'll learn:**
-- How a "monorepo" is structured (Angular 17 + Express)
-- Exact terminal commands to install and run both the frontend and backend locally
-- An introduction to Angular 17 Signals & Standalone components
-- An introduction to the Express API bootstrap flow
+![Mascot](./images/mascot.png)
 
-**Prerequisites:** Absolutely none! Just basic knowledge of what a website is.
+*“Vanga palagalam! Welcome to the Smart Wall Painter tutorial series! Namma inikku zero-la irundhu hero aaga porom. Oru periya Full-Stack (Angular + Express) app-a eppadi scratch-la irundhu start panni run panrathu nu paapom!”*
 
-> **📖 New terms in this chapter:**
-> - **Monorepo:** A single main folder (repository) that contains two separate projects inside it (in our case, the frontend Angular app and the backend Express server).
-> - **Signals:** A new, easy way in Angular to store changing data (like whether a tool is selected) so the screen updates instantly.
-> - **Standalone Components:** Modern Angular pieces that work all by themselves without needing confusing `NgModule` configuration files.
-> - **NPM (Node Package Manager):** A tool that downloads other people's code (packages) so you can use them in your app.
+📘 **What you'll learn (Enna kethuka porom):**
+- Monorepo structure eppadi work aaguthu.
+- `mkdir` la irundhu frontend/backend run panra varaikum EXACT terminal commands.
+- Angular 17 Signals & Express basics.
+
+**Prerequisites:** System-la Node.js install aagirkanum. Avlodhan!
+
+> **📖 New terms in this chapter (Pudhu Varthaigal):**
+> - **Monorepo:** Oru main folder-kulla rendu thani thani projects (namma frontend & backend) irukkurathu.
+> - **Signals:** Angular-la pudhusa vantha oru trick. Data change aana udane screen-a update panna ithu romba easy.
+
+
+> **📚 Official Links & Accounts (Munbe Ready Pannidunga!)**
+> - **MongoDB Atlas:** Create a free cluster at [mongodb.com/cloud/atlas/register](https://www.mongodb.com/cloud/atlas/register). Get your `MONGODB_URI`.
+> - **Cloudinary:** Create a free account at [cloudinary.com/users/register/free](https://cloudinary.com/users/register/free). Get your `CLOUDINARY_URL`.
+
 
 ---
 
-## 📘 Learn: System Architecture
+## 📘 Learn: Working Flow (Eppadi work aaguthu?)
 
-Before we type any code, let's look at how the Smart Wall Painter app is built. It has two halves that talk to each other:
+Oru chinna diagram paapom. Namma app eppadi pesikuthu nu puriyum:
 
 ```mermaid
 graph LR
-    A[Angular 17 Client<br/>(Your Browser)] <-->|Sends drawing data| B(Express Server<br/>(The Backend))
-    B <-->|Saves designs| C[(MongoDB Atlas<br/>Database)]
-    B <-->|Uploads pictures| D[Cloudinary<br/>Image Hosting]
-    A -->|Uploads| D
+    A[Angular 17 (Browser)] <-->|Sockets (Real-time)| B(Express Server)
+    B <-->|Mongoose| C[(MongoDB Database)]
+    A -->|Upload| D[Cloudinary (Images)]
 ```
 
 ---
 
-## 🛠️ Build: Running Locally Step-by-Step
+## 🛠️ Build: Step-by-Step Execution (Unga pc-la run pannuvom)
 
-Let's get this app running on your own computer! Follow every single command carefully.
+*“Ellam command um correct-a type pannunga, onnu kooda miss panna koodathu!”*
 
-### Step 0. Documentation & Account Creation
-Before downloading the code, let's look at the official documentation for the **MEAN Stack** (MongoDB, Express, Angular, Node.js) and create the free accounts you'll need for this project.
-
-**📚 Official Documentation Links:**
-- **[MongoDB Docs](https://www.mongodb.com/docs/)** - The NoSQL database used to store our project data.
-- **[Express.js Docs](https://expressjs.com/)** - The web framework for our Node.js backend.
-- **[Angular Docs](https://angular.dev/)** - The frontend framework for our UI.
-- **[Node.js Docs](https://nodejs.org/en/docs/)** - The JavaScript runtime for our backend.
-- **[Socket.IO Docs](https://socket.io/docs/v4/)** - Real-time communication for live collaboration.
-
-**🔑 Account Creation Steps:**
-
-1. **MongoDB Atlas (Database)**
-   - Go to [mongodb.com/cloud/atlas/register](https://www.mongodb.com/cloud/atlas/register) and sign up for a free account.
-   - Create a new "Cluster" (the free `M0` tier is perfect).
-   - Once created, click "Connect", choose "Drivers", and copy your Connection String (it looks like `mongodb+srv://...`). This will be your `MONGODB_URI`.
-   - *Make sure you replace `<password>` in the URL with your actual database user password!*
-
-2. **Cloudinary (Image Hosting)**
-   - Go to [cloudinary.com/users/register/free](https://cloudinary.com/users/register/free) and sign up.
-   - On your dashboard, you will see a section called "API Environment variable".
-   - Copy the URL (it looks like `cloudinary://API_KEY:API_SECRET@CLOUD_NAME`). This will be your `CLOUDINARY_URL`.
-
-### Step 1. Get the Code
-First, open your computer's terminal (or Command Prompt / PowerShell) and type these exact commands to download the project and go inside the folder:
+### Step 1. Folders Create Pannuvom
+Terminal open panni, oru pudhu folder create pannunga:
 
 ```bash
-# 1. Download the code from GitHub
-git clone https://github.com/Nandhini303/wall_painter.git
+# 1. Folder create pannunga
+mkdir my-super-app
 
-# 2. Go into the folder you just downloaded
-cd wall_painter
+# 2. Antha folder-kulla ponga
+cd my-super-app
 ```
 
-### Step 2. Configure the Backend Environment
-The backend needs a `.env` file to know your passwords and database links. 
+*(Actually, neenga existing code-a download pannalam using `git clone https://github.com/Nandhini303/wall_painter.git`, but structure puriyurathukaga namma empty-a yosipom. Cloning dhaan best!)*
 
-Inside your terminal, go into the backend folder and create a `.env` file. You can do this in VS Code or by typing:
+### Step 2. Backend Setup
+Backend folder-kulla poittu `.env` file create pannanum.
 
 ```bash
-# 1. Go into the backend server folder
 cd express-server
 ```
 
-Create a file named EXACTLY `.env` inside the `express-server` folder, and paste this inside:
-
+File peru exactly `.env` nu irukanum. Itha ulle podunga:
 ```text
 // file: express-server/.env
 PORT=5000
@@ -87,93 +68,35 @@ MONGODB_URI=your_mongo_url
 JWT_SECRET=supersecret
 CLOUDINARY_URL=your_cloudinary_url
 ```
-![step-1](https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=800&auto=format&fit=crop)
 
-### Step 3. Start the Backend Server
-Now that we are inside the `express-server` folder, we need to install the required packages and start the engine!
-
+### Step 3. Backend-a Run Pannuvom
+Dependencies install panni start pannalam!
 ```bash
-# 1. Download all the required Node packages for the backend
 npm install
-
-# 2. Start the backend server!
 npm run dev
 ```
-*If it works, your terminal will say: "Smart Wall Paint Visualizer Backend listening on port 5000". Leave this terminal open!*
+*Terminal-la "Backend listening on port 5000" nu varum!*
 
-### Step 4. Start the Frontend Client
-We need a **second** terminal to run the visual frontend. 
-
-1. Open a **new terminal tab** (or window).
-2. Make sure you navigate back to the main `wall_painter` folder.
-3. Then type these commands:
-
+### Step 4. Frontend-a Run Pannuvom
+Pudhu terminal open pannunga! Pazhaiyatha close pannidathinga.
 ```bash
-# 1. Go into the frontend Angular folder
 cd angular-client
-
-# 2. Download all the required Node packages for the frontend
 npm install
-
-# 3. Start the Angular website!
 npm start
 ```
-*If it works, your terminal will say it compiled successfully. Open your web browser and go to `http://localhost:4200` to see your app!*
+*Browser-la `http://localhost:4200` open panni paathinga na, namma UI theriyum!*
 
-![step-3](./images/01-step-3.png)
-
----
-
-## 📘 Learn: The Code Setup
-
-Now that it's running, let's look at the files that make it work.
-
-### Angular 17 Signals (The Frontend)
-In this app, we use Signals to manage what the user is doing. Look at the canvas editor file. Notice how simple `signal(...)` makes it to store the currently selected drawing tool:
-
-```typescript
-// file: angular-client/src/app/features/canvas-editor/canvas-editor.component.ts
-export class CanvasEditorComponent {
-  // This signal remembers what tool you clicked on!
-  activeTool = signal<'select' | 'pan' | 'draw' | 'wall' | 'erase'>('select');
-  
-  // This signal remembers if you can click the Undo button
-  canUndo = signal(false);
-}
-```
-
-### Express Bootstrap (The Backend)
-Our backend is initialized cleanly with Express and Socket.IO working together on the same port. Open `index.ts` to see how it starts up:
-
-```typescript
-// file: express-server/src/index.ts
-import express from 'express';
-import http from 'http';
-import { Server } from 'socket.io';
-
-// 1. Create the backend app
-const app = express();
-const server = http.createServer(app);
-
-// 2. Attach Socket.IO for real-time collaboration
-const io = new Server(server, { cors: { origin: '*' } });
-```
+![Enhanced UI](./images/ui_mockup.png)
 
 ---
 
-## 🧪 Practice: Build It Yourself
+## 🧪 Practice: Build It Yourself (Neengale Try Pannunga!)
 
-**Goal:** Add a new Express route and call it from Angular.
+**Goal:** Oru pudhu Express route add panni, Angular-la call pannunga.
 
-1. **Backend:** Open `express-server/src/index.ts`. Add a new route right before `app.listen()` that looks like this:
-   ```typescript
-   app.get('/api/hello', (req, res) => {
-     res.json({ message: "Hello from the backend!" });
-   });
-   ```
-2. **Frontend:** Open any Angular component and try to fetch `http://localhost:5000/api/hello` using the browser's `fetch()` API.
+1. Backend `index.ts`-la `app.get('/api/test')` add pannunga.
+2. Angular-la fetch panni console.log-la antha data-va print pannunga.
 
 **✅ Check yourself:**
-- [ ] Did you restart the Express server after adding the route?
-- [ ] Does navigating to `http://localhost:5000/api/hello` work in your web browser?
-- [ ] Were you able to display "Hello from the backend!" on your Angular dashboard?
+- [ ] Backend terminal error illama run aagutha?
+- [ ] Angular console-la data vanthuducha?
