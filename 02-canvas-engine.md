@@ -1,101 +1,711 @@
-# 🎨 Tutorial 2: Canvas Engine (Konva.js)
+# 🎨 Tutorial 2 – Canvas Engine (Easy Tanglish)
 
-📘 **What you'll learn:**
-- Setting up the Konva Stage and Layers
-- Building drawing tools and polygons
-- Handling Undo/Redo logic natively
+## 🔥 Intha Tutorial-la Enna Learn Pannuvom?
 
-**Prerequisites:** [Tutorial 1: Project Setup & Architecture](./01-fundamentals.md)
+Canvas Editor eppadi work aguthu nu full-a purinjukuvom.
 
-> **📖 New terms in this chapter:**
-> - **Konva.js:** An HTML5 2D canvas library that provides desktop-app-like interactivity (drag/drop, grouping).
-> - **Stage/Layer:** Konva's hierarchy. The Stage holds Layers, and Layers hold Shapes.
-> - **Imperative API:** Writing code that explicitly dictates *how* to do things step-by-step (unlike Angular templates which are declarative).
+Learn pannuvom
+
+- 🎨 Konva.js Introduction
+- 🖼 Stage & Layers
+- ✏ Drawing Tools
+- 🔷 Polygon Drawing
+- 🔵 Vertex Editing
+- ↩ Undo / Redo Logic
 
 ---
 
-## 📘 Learn: Canvas Hierarchy
+# 📘 Konva.js-na Enna?
 
-```mermaid
-graph TD
-    A[Konva Stage] --> B[Background Layer]
-    A --> C[Paint Layer]
-    A --> D[Polygon Anchors Layer]
-    C --> E(Image)
-    C --> F(Polygon Line)
-    D --> G(Draggable Anchor Circle)
+Normally HTML Canvas use panna romba kashtam.
+
+Konva.js use pannina
+
+- Drag & Drop
+- Resize
+- Rotate
+- Layers
+- Selection
+- Events
+
+ellame easy.
+
+Namma Canvas Editor full-a Konva use pannuthu.
+
+---
+
+# 🏗 Canvas Hierarchy
+
+```
+Konva Stage
+
+│
+
+├── Background Layer
+
+│
+
+├── Paint Layer
+
+│
+
+├── Polygon Layer
+
+│
+
+└── Anchor Layer
+```
+
+Simple Flow
+
+```
+Stage
+
+↓
+
+Layers
+
+↓
+
+Shapes
+
+↓
+
+User Interaction
 ```
 
 ---
 
-## 🛠️ Build: Drawing a Polygon
+# 🎨 Stage-na Enna?
 
-**Step 1. Initialize the Stage**
-Open the canvas editor and bind Konva to an HTML `<div>`.
+Stage-na main canvas.
 
-```typescript
-// file: angular-client/src/app/features/canvas-editor/canvas-editor.component.ts
-initStage() {
-  const container = this.canvasContainer.nativeElement;
-  this.stage = new Konva.Stage({
+Ellaa drawing-um Stage-kulla than irukum.
+
+Example
+
+```
+Browser
+
+↓
+
+Canvas
+
+↓
+
+Konva Stage
+```
+
+---
+
+# 🗂 Layer-na Enna?
+
+Layer-na Photoshop layer madhiri.
+
+Example
+
+```
+Background Layer
+
+↓
+
+Wall Paint Layer
+
+↓
+
+Polygon Layer
+
+↓
+
+Selection Layer
+
+↓
+
+Guides Layer
+```
+
+Each layer separate.
+
+One layer edit pannina matha layer affect aagadhu.
+
+---
+
+# 🚀 Stage Initialize
+
+First Stage create pannuvom.
+
+```ts
+const stage = new Konva.Stage({
     container: container,
-    width: container.offsetWidth,
-    height: container.offsetHeight,
-  });
-  this.paintLayer = new Konva.Layer();
-  this.stage.add(this.paintLayer);
-}
-```
-![step-1](./images/02-step-1.png)
-
-**Step 2. Render Draggable Anchors**
-To allow vertex editing, we render tiny blue circles on every polygon point.
-
-```typescript
-// file: angular-client/src/app/features/canvas-editor/canvas-editor.component.ts
-renderPolygonAnchors(polygon: Konva.Line) {
-  const points = polygon.points();
-  for (let i = 0; i < points.length; i += 2) {
-    const anchor = new Konva.Circle({
-      x: points[i],
-      y: points[i + 1],
-      radius: 6,
-      fill: '#3b82f6',
-      draggable: true,
-    });
-    this.polygonAnchorsLayer.add(anchor);
-  }
-}
+    width: 1200,
+    height: 700
+});
 ```
 
-**Step 3. Implement Undo/Redo**
-By tracking the last drawn shape, we can seamlessly pop it off the layer.
+Meaning
 
-```typescript
-// file: angular-client/src/app/features/canvas-editor/canvas-editor.component.ts
-undo(): void {
-  const children = this.paintLayer.getChildren();
-  const lastStroke = children[children.length - 1];
-  if (lastStroke) {
-    this.redoStack.push(lastStroke);
-    lastStroke.remove();
-    this.paintLayer.batchDraw();
-  }
-}
 ```
-![step-3](https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?q=80&w=800&auto=format&fit=crop)
+Container
+
+↓
+
+Create Stage
+
+↓
+
+Ready for Drawing
+```
 
 ---
 
-## 🧪 Practice: Build It Yourself
+# 🎨 Paint Layer
 
-**Goal:** Add a new Konva shape tool (e.g., an Ellipse) to the toolbar.
+Next
 
-1. Add `'ellipse'` to the `activeTool` Signal.
-2. Add a new button in the HTML template to select this tool.
-3. In the `mousedown` listener on the stage, if the tool is `ellipse`, create a new `Konva.Ellipse`.
+Paint Layer create pannuvom.
 
-**✅ Check yourself:**
-- [ ] Can you select the new tool?
-- [ ] Does dragging the mouse create an ellipse of varying size?
-- [ ] Does the Undo button successfully remove the newly drawn ellipse?
+```ts
+const paintLayer = new Konva.Layer();
+
+stage.add(paintLayer);
+```
+
+Flow
+
+```
+Stage
+
+↓
+
+Paint Layer
+
+↓
+
+Brush Drawing
+```
+
+---
+
+# ✏ Drawing Process
+
+User mouse press pannrar.
+
+```
+Mouse Down
+
+↓
+
+Create Shape
+
+↓
+
+Mouse Move
+
+↓
+
+Update Shape
+
+↓
+
+Mouse Up
+
+↓
+
+Save Shape
+```
+
+---
+
+# 🔷 Polygon Tool
+
+Polygon use panni wall select pannuvom.
+
+Example
+
+```
+Click
+
+↓
+
+Point 1
+
+↓
+
+Click
+
+↓
+
+Point 2
+
+↓
+
+Click
+
+↓
+
+Point 3
+
+↓
+
+Double Click
+
+↓
+
+Polygon Complete
+```
+
+---
+
+# 🔵 Vertex Handles
+
+Polygon create aana apram
+
+Every point-ku
+
+Small blue circle varum.
+
+```
+●──────●
+
+│      │
+
+│      │
+
+●──────●
+```
+
+Ivanga
+
+Anchor Handles.
+
+---
+
+# 🖱 Vertex Drag
+
+Blue Handle drag pannina
+
+Polygon update agum.
+
+```
+Old Shape
+
+↓
+
+Move Vertex
+
+↓
+
+New Shape
+```
+
+Real-time update.
+
+---
+
+# 🎨 Wall Painting
+
+Polygon complete aana
+
+Selected area-ku
+
+Color apply pannuvom.
+
+```
+Polygon
+
+↓
+
+Selected Area
+
+↓
+
+Fill Color
+
+↓
+
+Render
+```
+
+---
+
+# ↩ Undo
+
+Undo-na
+
+Last Action remove pannum.
+
+Example
+
+```
+Brush 1
+
+↓
+
+Brush 2
+
+↓
+
+Brush 3
+
+↓
+
+Undo
+
+↓
+
+Brush 3 Remove
+```
+
+Brush1 & Brush2 irukum.
+
+Canvas clear aagadhu.
+
+---
+
+# ↪ Redo
+
+Undo pannadhu
+
+Thirumba restore pannum.
+
+```
+Undo
+
+↓
+
+Redo
+
+↓
+
+Last Stroke Back
+```
+
+---
+
+# 🗃 Undo Stack
+
+Internally
+
+```
+Undo Stack
+
+↓
+
+Stroke1
+
+↓
+
+Stroke2
+
+↓
+
+Stroke3
+```
+
+Undo
+
+↓
+
+Stroke3 remove.
+
+Redo Stack-ku move agum.
+
+---
+
+# 🗃 Redo Stack
+
+```
+Redo Stack
+
+↓
+
+Stroke3
+```
+
+Redo
+
+↓
+
+Paint Layer-ku thirumba add pannuvom.
+
+---
+
+# 🖼 Image Layer
+
+Room image separate layer.
+
+```
+Room Image
+
+↓
+
+Background Layer
+```
+
+Brush remove pannina
+
+Image remove aagadhu.
+
+---
+
+# 🎨 Paint Flow
+
+```
+Upload Image
+
+↓
+
+Background Layer
+
+↓
+
+Select Brush
+
+↓
+
+Choose Color
+
+↓
+
+Draw
+
+↓
+
+Paint Layer
+
+↓
+
+Autosave
+```
+
+---
+
+# 🖌 Brush Tool
+
+Brush
+
+```
+Mouse Down
+
+↓
+
+Start Line
+
+↓
+
+Mouse Move
+
+↓
+
+Add Points
+
+↓
+
+Mouse Up
+
+↓
+
+Save Stroke
+```
+
+---
+
+# 🪣 Fill Tool
+
+Fill Tool
+
+```
+Click Wall
+
+↓
+
+Selected Polygon
+
+↓
+
+Apply Color
+
+↓
+
+Update Canvas
+```
+
+---
+
+# 🔍 Zoom
+
+Mouse Wheel
+
+↓
+
+Zoom In
+
+↓
+
+Zoom Out
+
+Konva Stage scale change pannum.
+
+---
+
+# ✋ Pan Tool
+
+Hold Mouse
+
+↓
+
+Move Canvas
+
+↓
+
+Release
+
+Canvas position mattum change agum.
+
+Objects move aagadhu.
+
+---
+
+# 🧪 Practice
+
+## Goal
+
+Ellipse Tool add pannunga.
+
+### Step 1
+
+Signal update
+
+```ts
+activeTool = signal('ellipse');
+```
+
+---
+
+### Step 2
+
+Toolbar button add pannunga.
+
+```html
+Ellipse
+```
+
+---
+
+### Step 3
+
+Mouse Down
+
+```ts
+new Konva.Ellipse({
+    x:100,
+    y:100
+});
+```
+
+---
+
+# ✅ Check Yourself
+
+✔ Ellipse Tool select panna mudiyudha?
+
+✔ Mouse drag panna ellipse create agudha?
+
+✔ Undo work agudha?
+
+✔ Redo work agudha?
+
+✔ Image disappear aagala?
+
+---
+
+# 🧠 Easy Memory Trick
+
+```
+Stage
+
+↓
+
+Layer
+
+↓
+
+Shape
+
+↓
+
+User Draw
+
+↓
+
+Undo Stack
+
+↓
+
+Redo Stack
+```
+
+---
+
+# 📌 Konva Components
+
+| Component | Purpose |
+|------------|----------|
+| Stage | Main Canvas |
+| Layer | Photoshop Layer |
+| Line | Brush Stroke |
+| Polygon | Wall Selection |
+| Circle | Vertex Handle |
+| Image | Room Image |
+| Transformer | Resize / Rotate |
+| Group | Multiple Objects |
+
+---
+
+# 🎯 Complete Canvas Flow
+
+```
+Upload Room
+
+↓
+
+Background Layer
+
+↓
+
+Select Tool
+
+↓
+
+Draw Polygon
+
+↓
+
+Vertex Editing
+
+↓
+
+Apply Paint
+
+↓
+
+Undo / Redo
+
+↓
+
+Autosave
+
+↓
+
+MongoDB
+
+↓
+
+Realtime Sync
+```
+
+---
+
+## ✅ End of Tutorial 2
+
+If you understand **Stage → Layer → Shape → Events → Undo/Redo**, you'll understand almost **90% of how the Smart Wall Paint Visualizer Canvas Engine works**.
