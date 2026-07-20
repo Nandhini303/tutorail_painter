@@ -34,6 +34,29 @@ graph LR
 
 Let's get this app running on your own computer! Follow every single command carefully.
 
+### Step 0. Documentation & Account Creation
+Before downloading the code, let's look at the official documentation for the **MEAN Stack** (MongoDB, Express, Angular, Node.js) and create the free accounts you'll need for this project.
+
+**📚 Official Documentation Links:**
+- **[MongoDB Docs](https://www.mongodb.com/docs/)** - The NoSQL database used to store our project data.
+- **[Express.js Docs](https://expressjs.com/)** - The web framework for our Node.js backend.
+- **[Angular Docs](https://angular.dev/)** - The frontend framework for our UI.
+- **[Node.js Docs](https://nodejs.org/en/docs/)** - The JavaScript runtime for our backend.
+- **[Socket.IO Docs](https://socket.io/docs/v4/)** - Real-time communication for live collaboration.
+
+**🔑 Account Creation Steps:**
+
+1. **MongoDB Atlas (Database)**
+   - Go to [mongodb.com/cloud/atlas/register](https://www.mongodb.com/cloud/atlas/register) and sign up for a free account.
+   - Create a new "Cluster" (the free `M0` tier is perfect).
+   - Once created, click "Connect", choose "Drivers", and copy your Connection String (it looks like `mongodb+srv://...`). This will be your `MONGODB_URI`.
+   - *Make sure you replace `<password>` in the URL with your actual database user password!*
+
+2. **Cloudinary (Image Hosting)**
+   - Go to [cloudinary.com/users/register/free](https://cloudinary.com/users/register/free) and sign up.
+   - On your dashboard, you will see a section called "API Environment variable".
+   - Copy the URL (it looks like `cloudinary://API_KEY:API_SECRET@CLOUD_NAME`). This will be your `CLOUDINARY_URL`.
+
 ### Step 1. Get the Code
 First, open your computer's terminal (or Command Prompt / PowerShell) and type these exact commands to download the project and go inside the folder:
 
